@@ -1,18 +1,15 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
-export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credenciales",
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: {},
+        password: {},
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -23,41 +20,41 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user || !user.isActive) return null;
+        if (!user) return null;
 
-        const passwordMatch = await bcrypt.compare(
+        const valid = await bcrypt.compare(
           credentials.password,
           user.password
         );
 
-        if (!passwordMatch) return null;
+        if (!valid) return null;
 
         return {
           id: user.id.toString(),
-          name: user.name,
           email: user.email,
           role: user.role,
         };
       },
     }),
   ],
+
   callbacks: {
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.role = token.role;
+      }
+      return session;
+    },
+
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role as string;
-      }
-      return session;
-    },
   },
-  secret: process.env.NEXTAUTH_SECRET,
-};
 
-const handler = NextAuth(authOptions);
+  secret: process.env.NEXTAUTH_SECRET,
+});
 
 export { handler as GET, handler as POST };
