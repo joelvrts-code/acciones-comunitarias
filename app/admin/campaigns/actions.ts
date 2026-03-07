@@ -92,13 +92,10 @@ export async function createCampaign(formData: FormData) {
       creatorName,
       creatorEmail,
       imageUrl,
-
       type,
       goal,
-
       emailSubject,
       emailBody,
-
       status: "pendiente",
     },
   });
@@ -154,10 +151,10 @@ export async function approveCampaign(formData: FormData) {
   });
 
   await createAuditLog(
-  "APROBAR_CAMPAÑA",
-  `La campaña "${campaign.title}" fue aprobada`,
-  (session.user as any)?.id
-);
+    "APROBAR_CAMPAÑA",
+    `La campaña "${campaign.title}" fue aprobada`,
+    (session.user as any)?.id
+  );
 
   revalidatePath("/admin/campaigns/pending");
   revalidatePath("/campaigns");
@@ -181,7 +178,7 @@ export async function rejectCampaign(formData: FormData) {
   await createAuditLog(
     "RECHAZAR_CAMPAÑA",
     `La campaña "${campaign.title}" fue rechazada`,
-    session.user?.id
+    (session.user as any)?.id
   );
 
   revalidatePath("/admin/campaigns/pending");
