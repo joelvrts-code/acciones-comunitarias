@@ -72,15 +72,9 @@ export default async function AdminCampaignsPage() {
                         </span>
                       )}
 
-                      {campaign.status === "pausada" && (
-                        <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs">
-                          Pausada
-                        </span>
-                      )}
-
-                      {campaign.status === "cerrada" && (
+                      {campaign.status === "rechazada" && (
                         <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">
-                          Cerrada
+                          Rechazada
                         </span>
                       )}
 
@@ -119,7 +113,7 @@ export default async function AdminCampaignsPage() {
                       {signatures}
                     </td>
 
-                    {/* EMAILS ENVIADOS */}
+                    {/* EMAILS */}
                     <td className="p-4 font-semibold text-purple-600">
                       {emailsSent}
                     </td>
@@ -127,7 +121,7 @@ export default async function AdminCampaignsPage() {
                     {/* ACCIONES */}
                     <td className="p-4 flex gap-2">
 
-                      {/* VER CAMPAÑA */}
+                      {/* VER */}
                       <Link
                         href={`/campaigns/${campaign.id}`}
                         target="_blank"
@@ -136,41 +130,33 @@ export default async function AdminCampaignsPage() {
                         Ver
                       </Link>
 
-                      {/* ACTIVAR */}
-                      <form action={activateCampaign}>
-                        <input
-                          type="hidden"
-                          name="campaignId"
-                          value={campaign.id}
-                        />
-                        <button className="bg-green-500 text-white px-3 py-1 rounded">
-                          Activar
-                        </button>
-                      </form>
+                      {/* APROBAR */}
+                      {campaign.status === "pendiente" && (
+                        <form action={approveCampaign}>
+                          <input
+                            type="hidden"
+                            name="campaignId"
+                            value={campaign.id}
+                          />
+                          <button className="bg-green-500 text-white px-3 py-1 rounded">
+                            Aprobar
+                          </button>
+                        </form>
+                      )}
 
-                      {/* PAUSAR */}
-                      <form action={pauseCampaign}>
-                        <input
-                          type="hidden"
-                          name="campaignId"
-                          value={campaign.id}
-                        />
-                        <button className="bg-yellow-500 text-white px-3 py-1 rounded">
-                          Pausar
-                        </button>
-                      </form>
-
-                      {/* CERRAR */}
-                      <form action={closeCampaign}>
-                        <input
-                          type="hidden"
-                          name="campaignId"
-                          value={campaign.id}
-                        />
-                        <button className="bg-red-600 text-white px-3 py-1 rounded">
-                          Cerrar
-                        </button>
-                      </form>
+                      {/* RECHAZAR */}
+                      {campaign.status === "pendiente" && (
+                        <form action={rejectCampaign}>
+                          <input
+                            type="hidden"
+                            name="campaignId"
+                            value={campaign.id}
+                          />
+                          <button className="bg-red-600 text-white px-3 py-1 rounded">
+                            Rechazar
+                          </button>
+                        </form>
+                      )}
 
                     </td>
 
