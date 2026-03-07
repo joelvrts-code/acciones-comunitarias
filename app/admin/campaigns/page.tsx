@@ -2,11 +2,6 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { approveCampaign, rejectCampaign } from "./actions";
 
-import {
-  approveCampaign,
-  rejectCampaign
-} from "./actions";
-
 export default async function AdminCampaignsPage() {
 
   const campaigns = await prisma.campaign.findMany({
