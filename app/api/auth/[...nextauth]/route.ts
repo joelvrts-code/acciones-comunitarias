@@ -1,6 +1,36 @@
-import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
+import NextAuth, { NextAuthOptions } from "next-auth"
+import GoogleProvider from "next-auth/providers/google"
 
-const handler = NextAuth(authOptions);
+export const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
 
-export { handler as GET, handler as POST };
+  callbacks: {
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.sub as string
+        session.user.role = (token.role as string) || "user"
+      }
+      return session
+    },
+
+    async jwt({ token }) {
+      if (!token.role) {
+        token.role = "admin" // puedes cambiar lógica luego
+      }
+      return token
+    },
+  },
+
+  session: {
+    strategy: "jwt",
+  },
+}
+
+const handler = NextAuth(authOptions)
+
+export { handler as GET, handler as POST }
