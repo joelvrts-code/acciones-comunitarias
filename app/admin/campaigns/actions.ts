@@ -154,10 +154,10 @@ export async function approveCampaign(formData: FormData) {
   });
 
   await createAuditLog(
-    "APROBAR_CAMPAÑA",
-    `La campaña "${campaign.title}" fue aprobada`,
-    session.user?.id
-  );
+  "APROBAR_CAMPAÑA",
+  `La campaña "${campaign.title}" fue aprobada`,
+  (session.user as any)?.id
+);
 
   revalidatePath("/admin/campaigns/pending");
   revalidatePath("/campaigns");
