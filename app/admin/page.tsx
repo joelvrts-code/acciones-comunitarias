@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import DashboardChart from "./DashboardChart";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
