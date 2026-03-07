@@ -12,9 +12,10 @@ import { redirect } from "next/navigation";
 //////////////////////////////////////////////////////
 
 async function requireAdmin() {
+
   const session = await getServerSession(authOptions);
 
-  if (!session || session.user?.role !== "admin") {
+  if (!session || (session.user as any)?.role !== "admin") {
     throw new Error("No autorizado");
   }
 
