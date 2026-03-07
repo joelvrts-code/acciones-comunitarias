@@ -1,8 +1,8 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { approveCampaign, rejectCampaign } from "../actions";
+import { authOptions } from "@/lib/auth";
+import { approveCampaign, rejectCampaign } from "@/app/campaigns/actions";
 
 export default async function PendingCampaignsPage() {
   const session = await getServerSession(authOptions);
