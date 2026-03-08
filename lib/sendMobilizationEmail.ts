@@ -1,50 +1,18 @@
 import prisma from "@/lib/prisma";
-import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export async function sendMobilizationEmail(
-  subject: string,
-  message: string,
-  campaignUrl: string
-) {
-
+export async function sendMobilizationEmail(campaignId: number) {
   const participants = await prisma.participant.findMany({
     where: {
-      subscribed: true
+      campaignId: campaignId,
     },
-    distinct: ["email"],
     select: {
       email: true,
-      firstName: true
-    }
+    },
   });
 
-  for (const user of participants) {
+  const emails = participants.map((p) => p.email);
 
-    await resend.emails.send({
-      from: "Acciones Comunitarias <no-reply@accionescomunitarias.org>",
-      to: user.email,
-      subject,
-      html: `
-        <h2>${subject}</h2>
+  console.log("Emails para movilización:", emails);
 
-        <p>Hola ${user.firstName},</p>
-
-        <p>${message}</p>
-
-        <p>
-          <a href="${campaignUrl}">
-            Participar ahora
-          </a>
-        </p>
-
-        <hr>
-
-        <p>Acciones Comunitarias</p>
-      `,
-    });
-
-  }
-
+  // aquí luego conectamos el envío real de email
 }
