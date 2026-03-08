@@ -83,27 +83,21 @@ model Campaign {
 //////////////////////////////////////////////////////
 
 model Participant {
-  id Int @id @default(autoincrement())
-
-  firstName String
-  lastName  String?
-  email     String
-  zipCode   String?
-
-  createdAt DateTime @default(now())
-
-  //////////////////////////////////////////////////////
-  // RELACIÓN CAMPAÑA
-  //////////////////////////////////////////////////////
+  id         Int     @id @default(autoincrement())
+  name       String
+  email      String
+  zipCode    String?
+  subscribed Boolean @default(true)
 
   campaignId Int
   campaign   Campaign @relation(fields: [campaignId], references: [id])
 
-  //////////////////////////////////////////////////////
-  // RELACIÓN EMAIL LOGS
-  //////////////////////////////////////////////////////
+  createdAt DateTime @default(now())
 
   emailLogs EmailLog[]
+
+  @@index([campaignId])
+  @@index([email])
 }
 
 //////////////////////////////////////////////////////
