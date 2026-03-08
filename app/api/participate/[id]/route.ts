@@ -18,10 +18,6 @@ export async function POST(
 
   const subscribe = formData.get("subscribe") === "on";
 
-  const municipio = zipCode
-    ? zipMunicipios[zipCode] || null
-    : null;
-
   const campaign = await prisma.campaign.findUnique({
     where: { id: campaignId },
     include: {
@@ -51,17 +47,15 @@ export async function POST(
 
   try {
 
+    const name = `${firstName} ${lastName}`;
+
     const participant = await prisma.participant.create({
       data: {
-        firstName,
-        lastName,
+        name,
         email,
         zipCode,
-        municipio,
         subscribed: subscribe,
         campaignId,
-        signed: campaign.type !== "email",
-        emailed: campaign.type !== "petition",
       },
     });
 
