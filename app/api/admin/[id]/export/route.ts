@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { zipMunicipios } from "@/lib/zipMunicipios";
 
 export async function GET(
   request: Request,
@@ -9,27 +10,40 @@ export async function GET(
 
   const campaign = await prisma.campaign.findUnique({
     where: { id: campaignId },
-    include: { participants: true },
+    include: {
+      participants: {
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+    },
   });
 
   if (!campaign) {
-    return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+    return NextResponse.json({ error: "Campaña no encontrada" }, { status: 404 });
   }
 
-  const csvHeader = "Nombre,Apellido,Email,ZipCode,Fecha\n";
+  // eliminar emails duplicados
+  const uniqueParticipants = Array.from(
+    new Map(campaign.participants.map((p) => [p.email, p])).values()
+  );
 
-  const csvRows = campaign.participants
+  const header = "name;email;zipCode;municipio;createdAt";
+
+  const csvRows = uniqueParticipants
     .map((p) => {
-      return `${p.firstName},${p.lastName},${p.email},${p.zipCode},${p.createdAt.toISOString()}`;
+      const municipio = zipMunicipios[p.zipCode ?? ""] ?? "";
+
+      return `${p.name};${p.email};${p.zipCode ?? ""};${municipio};${p.createdAt.toISOString()}`;
     })
     .join("\n");
 
-  const csvContent = csvHeader + csvRows;
+  const csv = header + "\n" + csvRows;
 
-  return new NextResponse(csvContent, {
+  return new NextResponse(csv, {
     headers: {
-      "Content-Type": "text/csv",
-      "Content-Disposition": `attachment; filename="campaign-${campaignId}-participants.csv"`,
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": `attachment; filename="campaign-${campaignId}-participants.csv`,
     },
   });
 }
